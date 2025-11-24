@@ -13,6 +13,7 @@ import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +24,7 @@ public class UserService {
   UserRepository userRepository;
   private final UserMapper userMapper;
   UserSpecification userSpecification;
+  PasswordEncoder passwordEncoder;
 
   public UserDTO createUser(UserCreateRequest request) {
 
@@ -31,6 +33,8 @@ public class UserService {
     }
 
     User user = userMapper.toUser(request);
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
+    user.setStatus("1");
 
     user = userRepository.save(user);
 
@@ -50,7 +54,7 @@ public class UserService {
 
     List<User> users = userSpecification.getUserSpec(request);
 
-    return userMapper.toUserDTO(users);
+    return userMapper.toListUserDTO(users);
   }
 
   public void deleteUser(Long id) {

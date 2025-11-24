@@ -1,6 +1,7 @@
 package com.group2.gymmanagement.mapper;
 
 
+import com.group2.gymmanagement.dto.request.RegisterRequest;
 import com.group2.gymmanagement.dto.request.UserCreateRequest;
 import com.group2.gymmanagement.dto.request.UserUpdateRequest;
 import com.group2.gymmanagement.dto.response.UserDTO;
@@ -13,12 +14,14 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-   public User toUser(UserCreateRequest userCreateRequest);
+   User toUser(UserCreateRequest userCreateRequest);
 
-   public UserDTO toUserDTO(User user);
+   UserDTO toUserDTO(User user);
 
    @Mapping(target = "id", ignore = true)
-   public User updateUser(UserUpdateRequest request, @MappingTarget User target);
+   User updateUser(UserUpdateRequest request, @MappingTarget User target);
 
-   public List<UserDTO> toUserDTO(List<User> users);
+   List<UserDTO> toListUserDTO(List<User> users);
+
+   User registerUser(RegisterRequest registerRequest);
 }
