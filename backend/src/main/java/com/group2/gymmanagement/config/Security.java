@@ -51,7 +51,6 @@ public class Security {
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/**").permitAll()         // login, register
-            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .requestMatchers("/admin/**").hasRole("ADMIN")
             .requestMatchers("/trainer/**").hasAnyRole("TRAINER", "ADMIN")
             .anyRequest().authenticated()
