@@ -23,11 +23,10 @@ import lombok.NoArgsConstructor;
 public class TrainerProfile {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long trainerId; // FK = UserID
+  private Long id;   // PK = user_id
 
   @OneToOne
-  @MapsId
+  @MapsId          // <-- Dùng user.id làm PK
   @JoinColumn(name = "id")
   private User user;
 
@@ -36,4 +35,11 @@ public class TrainerProfile {
 
   @Column(name = "specialization")
   private String specialization;
+
+  @Column(name = "completed")
+  private Boolean completed;
+
+  @Column(name = "experience_years")
+  private Integer experienceYears;
 }
+
