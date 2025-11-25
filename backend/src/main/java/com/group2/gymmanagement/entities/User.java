@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name="user")
@@ -17,27 +19,39 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_id")
     private Long id;
 
     @Column(name="username",nullable = false)
-    private String username;
+    private String userName;
 
     @Column(name="password",nullable = false)
     private String password;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "fullname")
+    private String fullName;
+
+    @Column(name = "Phone")
+    private String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private UserRole role;
 
-    @Column(name="created")
-    private LocalDateTime created;
+    @Column(name = "status")
+    private String status;
 
-    @Column(name="is_active")
-    private Boolean isActive = true;
+    @CreationTimestamp
+    @Column(name = "created")
+    private LocalDateTime createdDate;
 
-    @Column(name = "last_login")
-    private LocalDateTime lastLogin;
+    @UpdateTimestamp
+    @Column(name = "updated")
+    private LocalDateTime updatedDate;
 }
