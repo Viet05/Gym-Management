@@ -6,7 +6,6 @@ import com.group2.gymmanagement.dto.response.UserDTO;
 import com.group2.gymmanagement.entities.User;
 import com.group2.gymmanagement.mapper.UserMapper;
 import com.group2.gymmanagement.repository.UserRepository;
-import com.group2.gymmanagement.repository.UserSpecification;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
