@@ -1,5 +1,6 @@
 package com.group2.gymmanagement.service;
 
+import com.group2.gymmanagement.Specification.UserSpecification;
 import com.group2.gymmanagement.dto.request.UserCreateRequest;
 import com.group2.gymmanagement.dto.request.UserUpdateRequest;
 import com.group2.gymmanagement.dto.response.UserDTO;
@@ -51,7 +52,7 @@ public class UserService {
 
   public List<UserDTO> getUser(Map<String, Objects> request) {
 
-    List<User> users = userSpecification.getUserSpec(request);
+    List<User> users = userSpecification.getUserSpecification(request);
 
     return userMapper.toListUserDTO(users);
   }
