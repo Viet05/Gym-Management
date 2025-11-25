@@ -6,14 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
-  Optional<User> findByUserName(String userName);
+  Optional<User> findByUsername(String username);
 
-  boolean existsByUserName(String userName);
+  boolean existsByUsername(String username);
 
   List<User> findByRole(UserRole role);
 

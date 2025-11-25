@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,11 +19,13 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-  private final JwtUtils jwtUtils;
-  private final CustomUserDetailsService customUserDetailsService;
+  @Autowired
+  private JwtUtils jwtUtils;
+
+  @Autowired
+  private CustomUserDetailsService customUserDetailsService;
 
   @Override
   protected void doFilterInternal(
@@ -64,7 +67,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
       }
 
     } catch (Exception e) {
-      log.error("Cannot set user authentication", e);
+      e.printStackTrace();
     }
 
     // 6. Cho request đi tiếp

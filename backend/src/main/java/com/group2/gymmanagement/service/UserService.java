@@ -1,5 +1,6 @@
 package com.group2.gymmanagement.service;
 
+import com.group2.gymmanagement.Specification.UserSpecification;
 import com.group2.gymmanagement.dto.request.UserCreateRequest;
 import com.group2.gymmanagement.dto.request.UserUpdateRequest;
 import com.group2.gymmanagement.dto.response.UserDTO;
@@ -8,10 +9,10 @@ import com.group2.gymmanagement.mapper.UserMapper;
 import com.group2.gymmanagement.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,13 +46,13 @@ public class UserService {
 
     return userMapper
         .toUserDTO(userRepository
-        .save(userMapper
-            .updateUser(request, user)));
+            .save(userMapper
+                .updateUser(request, user)));
   }
 
-  public List<UserDTO> getUser(Map<String, Objects> request) {
+  public List<UserDTO> getUser(Map<String, Object> request) {
 
-    List<User> users = userSpecification.getUserSpec(request);
+    List<User> users = userSpecification.getUsersByFilter(request);
 
     return userMapper.toListUserDTO(users);
   }
