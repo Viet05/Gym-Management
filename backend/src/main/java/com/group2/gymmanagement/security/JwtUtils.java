@@ -31,13 +31,13 @@ public class JwtUtils {
     JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
 
     JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-        .subject(user.getUserName())          // Username
+        .subject(user.getUsername())
         .issuer(ISSUER)
         .issueTime(new Date())
         .expirationTime(new Date(Instant.now()
-            .plus(3, ChronoUnit.HOURS)     // token 3h
+            .plus(3, ChronoUnit.HOURS)
             .toEpochMilli()))
-        .claim("role", user.getRole().name())  // LẤY ROLE TỪ ENTITY
+        .claim("role", user.getRole().name())
         .claim("userId", user.getId())
         .build();
 

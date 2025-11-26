@@ -28,7 +28,7 @@ public class AuthenService {
 
   public AuthResponse registerUser(RegisterRequest request) {
 
-    if (userRepository.existsByEmail(request.getEmail()) && userRepository.existsByUserName(
+    if (userRepository.existsByEmail(request.getEmail()) && userRepository.existsByUsername(
         request.getUsername())) {
       throw new RuntimeException("Email already in use");
     }
@@ -46,15 +46,13 @@ public class AuthenService {
         token,
         "Bearer",
         user.getId(),
-        user.getUserName()
-    );
+        user.getUsername());
   }
 
-  public AuthResponse login(LoginRequest request){
+  public AuthResponse login(LoginRequest request) {
 
-    var user = userRepository.findByUserName(request.getUsername()).orElseThrow(
-        () -> new RuntimeException("Incorrect username or password")
-    );
+    User user = userRepository.findByUsername(request.getUsername()).orElseThrow(
+        () -> new RuntimeException("Incorrect username or password"));
 
     boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
@@ -68,7 +66,6 @@ public class AuthenService {
         token,
         "Bearer",
         user.getId(),
-        user.getUserName()
-    );
+        user.getUsername());
   }
 }

@@ -39,6 +39,9 @@ public class MembershipPackage implements Serializable {
   @Column(name = "description")
   private String description;
 
+  @Column(name = "active")
+  private String active;
+
   @CreationTimestamp
   @Column(name = "created")
   private LocalDateTime createdDate;

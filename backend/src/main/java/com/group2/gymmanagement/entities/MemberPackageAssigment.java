@@ -27,11 +27,11 @@ public class MemberPackageAssigment {
   private Long id;
 
   @ManyToOne
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "member_id")
   private User member;
 
   @ManyToOne
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "package_id")
   private MembershipPackage membershipPackage;
 
   @Column(name = "start_date")

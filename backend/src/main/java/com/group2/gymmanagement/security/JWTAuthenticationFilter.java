@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,11 +19,13 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-  private final JwtUtils jwtUtils;
-  private final CustomUserDetailsService customUserDetailsService;
+  @Autowired
+  private JwtUtils jwtUtils;
+
+  @Autowired
+  private CustomUserDetailsService customUserDetailsService;
 
   @Override
   protected void doFilterInternal(
@@ -32,21 +35,21 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
   ) throws ServletException, IOException {
 
     try {
-      // 1. Lấy token từ header Authorization
+      //Lấy token từ header Authorization
       String token = getJwtFromRequest(request);
 
       if (token != null && jwtUtils.validateToken(token)) {
 
-        // 2. Lấy username từ token
+        //Lấy username từ token
         String username = jwtUtils.getUsernameFromToken(token);
 
-        // 3. Đảm bảo security chưa được set cho request này
+        //security chưa được set cho request
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
           // Load user từ DB
           UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-          // 4. Tạo authentication object
+          //Tạo authentication object
           UsernamePasswordAuthenticationToken authentication =
               new UsernamePasswordAuthenticationToken(
                   userDetails,
@@ -58,16 +61,16 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
               new WebAuthenticationDetailsSource().buildDetails(request)
           );
 
-          // 5. Set vào SecurityContext để Spring Security biết user nào đang gọi API
+          //Set vào SecurityContext để Spring Security biết user nào đang gọi API
           SecurityContextHolder.getContext().setAuthentication(authentication);
         }
       }
 
     } catch (Exception e) {
-      log.error("Cannot set user authentication", e);
+      e.printStackTrace();
     }
 
-    // 6. Cho request đi tiếp
+    //Cho request đi tiếp
     filterChain.doFilter(request, response);
   }
 
