@@ -9,16 +9,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-@AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
   private final User user;
 
+  public CustomUserDetails(User user) { // ← constructor nhận User
+    this.user = user;
+  }
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return Collections.singletonList(
-        new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
-    );
+        new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
   }
 
   @Override
@@ -28,7 +30,7 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public String getUsername() {
-    return user.getUserName();
+    return user.getUsername();
   }
 
   @Override

@@ -7,7 +7,6 @@ import com.group2.gymmanagement.dto.response.UserDTO;
 import com.group2.gymmanagement.service.UserService;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -50,7 +49,7 @@ public class AdminController {
   }
 
   @GetMapping(value = "/users")
-  public ApiResponse<List<UserDTO>> getAllUsers(@RequestParam Map<String, Objects> request) {
+  public ApiResponse<List<UserDTO>> getAllUsers(@RequestParam Map<String, Object> request) {
     return ApiResponse.<List<UserDTO>>builder()
         .code(200)
         .message("Success")

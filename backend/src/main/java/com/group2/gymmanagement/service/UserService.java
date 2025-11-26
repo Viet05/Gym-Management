@@ -52,7 +52,7 @@ public class UserService {
 
   public List<UserDTO> getUser(Map<String, Objects> request) {
 
-    List<User> users = userSpecification.getUserSpecification(request);
+    List<User> users = userSpecification.getUserSpec(request);
 
     return userMapper.toListUserDTO(users);
   }
