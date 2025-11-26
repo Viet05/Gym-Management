@@ -37,7 +37,7 @@ public class User {
     @Column(name = "fullname")
     private String fullName;
 
-    @Column(name = "Phone")
+    @Column(name = "phone")
     private String phone;
 
     @Enumerated(EnumType.STRING)
