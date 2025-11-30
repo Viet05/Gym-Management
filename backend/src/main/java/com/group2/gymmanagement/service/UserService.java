@@ -48,7 +48,6 @@ public class UserService {
 
     user = userRepository.save(user);
 
-
     if (user.getRole() == UserRole.TRAINER) {
       TrainerProfile profile = TrainerProfile.builder()
           .user(user)
@@ -66,15 +65,12 @@ public class UserService {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("User not found"));
 
-
     if (!user.getEmail().equals(request.getEmail()) &&
         userRepository.existsByEmail(request.getEmail())) {
       throw new RuntimeException("Email already exists");
     }
 
-
     userMapper.updateUser(request, user);
-
 
     if (request.getPassword() != null && !request.getPassword().isBlank()) {
       user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -89,7 +85,9 @@ public class UserService {
   }
 
   public void deleteUser(Long id) {
+    if (trainerProfileRepository.existsById(id)) {
+      trainerProfileRepository.deleteById(id);
+    }
     userRepository.deleteById(id);
   }
 }
-
