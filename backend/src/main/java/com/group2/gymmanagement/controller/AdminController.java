@@ -21,6 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.group2.gymmanagement.dto.response.DashboardStatsDTO;
+import com.group2.gymmanagement.enums.UserRole;
+import com.group2.gymmanagement.repository.AttendanceRepository;
+import com.group2.gymmanagement.repository.PaymentRepository;
+import com.group2.gymmanagement.repository.UserRepository;
+
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -29,6 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
 
   UserService userService;
+  UserRepository userRepository;
+  PaymentRepository paymentRepository;
+  AttendanceRepository attendanceRepository;
 
   @PostMapping(value = "/users")
   public ApiResponse<UserDTO> createUser(@RequestBody UserCreateRequest request) {
@@ -54,6 +63,29 @@ public class AdminController {
         .code(200)
         .message("Success")
         .data(userService.getUser(request))
+        .build();
+  }
+
+  @GetMapping(value = "/stats")
+  public ApiResponse<DashboardStatsDTO> getDashboardStats() {
+    Double totalRevenue = paymentRepository.sumTotalRevenue();
+    long totalMembers = userRepository.countByRole(UserRole.MEMBER);
+    long activeMembers = userRepository.countByStatus("1");
+    long visitsToday = attendanceRepository.countByDate(java.time.LocalDate.now().toString());
+
+    DashboardStatsDTO stats = DashboardStatsDTO.builder()
+        .totalRevenue(totalRevenue != null ? totalRevenue : 0.0)
+        .totalMembers(totalMembers)
+        .activeMembers(activeMembers)
+        .visitsToday(visitsToday)
+        .revenueTrend(12.5) // Mock trend
+        .memberTrend(8.2) // Mock trend
+        .build();
+
+    return ApiResponse.<DashboardStatsDTO>builder()
+        .code(200)
+        .message("Success")
+        .data(stats)
         .build();
   }
 

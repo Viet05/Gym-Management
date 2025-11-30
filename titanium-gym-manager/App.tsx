@@ -34,6 +34,30 @@ const App: React.FC = () => {
     }
   }, []);
 
+  // Fetch packages when authenticated
+  useEffect(() => {
+    if (authView === 'app') {
+      const fetchPackages = async () => {
+        try {
+          const { packagesAPI } = await import('./api/packages.api');
+          const data = await packagesAPI.getAllPackages();
+          const mappedPackages: GymPackage[] = data.map(dto => ({
+            id: dto.id,
+            name: dto.name,
+            price: dto.price,
+            durationMonths: parseInt(dto.durationMonth) || 1,
+            features: dto.description ? dto.description.split('\n') : [],
+            color: 'from-slate-700 to-slate-600' // Default color
+          }));
+          setPackages(mappedPackages);
+        } catch (error) {
+          console.error("Failed to fetch packages", error);
+        }
+      };
+      fetchPackages();
+    }
+  }, [authView]);
+
   const handleLogin = (authResponse: AuthResponse) => {
     // Create a simple user object from AuthResponse
     // In a full implementation, you'd fetch full user details from /api/users/{userId}

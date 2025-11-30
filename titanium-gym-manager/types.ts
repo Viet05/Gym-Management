@@ -103,3 +103,28 @@ export interface UserUpdateRequest {
   status?: string;
   role?: UserRole;
 }
+
+export interface PackageDTO {
+  id: string;
+  name: string;
+  durationMonth: string;
+  price: number;
+  description: string;
+  active: string;
+  createdDate?: string;
+  updatedDate?: string;
+}
+
+export interface PackageCreateRequest {
+  name: string;
+  durationMonth: string;
+  price: number;
+  description: string;
+}
+
+export interface PackageUpdateRequest {
+  name?: string;
+  durationMonth?: string;
+  price?: number;
+  description?: string;
+}

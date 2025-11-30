@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit2, Trash2, Mail, Phone, Shield, User } from 'lucide-react';
-import { Member, GymPackage } from '../types';
+import { Member, GymPackage, UserCreateRequest, UserUpdateRequest } from '../types';
 import { Modal } from '../components/ui/Modal';
+import { usersAPI } from '../api/users.api';
 
 interface MembersProps {
   members: Member[];
@@ -13,6 +14,33 @@ export const Members: React.FC<MembersProps> = ({ members, packages, setMembers 
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch users from backend
+  const fetchUsers = async () => {
+    try {
+      const userDTOs = await usersAPI.getAllUsers();
+      const mappedMembers: Member[] = userDTOs.map(dto => ({
+        id: dto.id.toString(),
+        fullName: dto.fullName,
+        username: dto.userName,
+        email: dto.email,
+        phone: dto.phone,
+        role: dto.role,
+        status: (dto.status as any) || 'Active',
+        packageId: '', // Not yet in backend
+        joinDate: new Date().toISOString().split('T')[0], // Not yet in backend
+        avatarUrl: `https://picsum.photos/100/100?random=${dto.id}`
+      }));
+      setMembers(mappedMembers);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   // Form State
   const [formData, setFormData] = useState<Partial<Member>>({
@@ -56,30 +84,54 @@ export const Members: React.FC<MembersProps> = ({ members, packages, setMembers 
     setIsModalOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.fullName || !formData.email || !formData.username) return; // Simple validation
 
-    if (editingMember) {
-      // Update
-      setMembers((prev) =>
-        prev.map((m) => (m.id === editingMember.id ? { ...m, ...formData } as Member : m))
-      );
-    } else {
-      // Create
-      const newMember: Member = {
-        ...(formData as Member),
-        id: `mem_${Date.now()}`,
-        joinDate: new Date().toISOString().split('T')[0],
-        avatarUrl: formData.avatarUrl || `https://picsum.photos/100/100?random=${Date.now()}`
-      };
-      setMembers((prev) => [newMember, ...prev]);
+    setIsLoading(true);
+    try {
+      if (editingMember) {
+        // Update
+        const updateRequest: UserUpdateRequest = {
+          fullName: formData.fullName,
+          userName: formData.username,
+          email: formData.email,
+          phone: formData.phone,
+          role: formData.role,
+          status: formData.status
+        };
+        await usersAPI.updateUser(parseInt(editingMember.id), updateRequest);
+      } else {
+        // Create
+        const createRequest: UserCreateRequest = {
+          fullName: formData.fullName!,
+          userName: formData.username!,
+          email: formData.email!,
+          phone: formData.phone!,
+          password: formData.password || '123456', // Default password if not provided
+          role: formData.role
+        };
+        await usersAPI.createUser(createRequest);
+      }
+      // Refresh list
+      await fetchUsers();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Failed to save user:', error);
+      alert('Failed to save user. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-    setIsModalOpen(false);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to remove this member?')) {
-      setMembers((prev) => prev.filter((m) => m.id !== id));
+      try {
+        await usersAPI.deleteUser(parseInt(id));
+        await fetchUsers();
+      } catch (error) {
+        console.error('Failed to delete user:', error);
+        alert('Failed to delete user.');
+      }
     }
   };
 
@@ -149,43 +201,41 @@ export const Members: React.FC<MembersProps> = ({ members, packages, setMembers 
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-xs font-bold border flex items-center w-fit ${
-                        member.role === 'ADMIN' 
-                        ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' 
+                    <span className={`px-2 py-1 rounded text-xs font-bold border flex items-center w-fit ${member.role === 'ADMIN'
+                        ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
                         : member.role === 'TRAINER'
-                        ? 'bg-orange-500/10 text-orange-400 border-orange-500/20'
-                        : 'bg-slate-800 text-slate-400 border-slate-700'
-                    }`}>
-                        {member.role === 'ADMIN' && <Shield className="w-3 h-3 mr-1" />}
-                        {member.role === 'TRAINER' && <User className="w-3 h-3 mr-1" />}
-                        {member.role}
+                          ? 'bg-orange-500/10 text-orange-400 border-orange-500/20'
+                          : 'bg-slate-800 text-slate-400 border-slate-700'
+                      }`}>
+                      {member.role === 'ADMIN' && <Shield className="w-3 h-3 mr-1" />}
+                      {member.role === 'TRAINER' && <User className="w-3 h-3 mr-1" />}
+                      {member.role}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                       {packages.find(p => p.id === member.packageId)?.name || 'None'}
-                     </span>
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                      {packages.find(p => p.id === member.packageId)?.name || 'None'}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                      member.status === 'Active' 
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${member.status === 'Active'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                         : member.status === 'Inactive'
-                        ? 'bg-red-500/10 text-red-400 border-red-500/20'
-                        : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-                    }`}>
+                          ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                          : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                      }`}>
                       {member.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
+                      <button
                         onClick={() => handleOpenModal(member)}
                         className="p-2 text-slate-400 hover:text-gym-400 hover:bg-gym-500/10 rounded-lg transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDelete(member.id)}
                         className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                       >
@@ -213,31 +263,31 @@ export const Members: React.FC<MembersProps> = ({ members, packages, setMembers 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-                <label className="block text-sm font-medium text-slate-400 mb-1">Username</label>
-                <input
+              <label className="block text-sm font-medium text-slate-400 mb-1">Username</label>
+              <input
                 type="text"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none"
                 placeholder="jdoe"
-                />
+              />
             </div>
             <div>
-                <label className="block text-sm font-medium text-slate-400 mb-1">Role</label>
-                <select
+              <label className="block text-sm font-medium text-slate-400 mb-1">Role</label>
+              <select
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
                 className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none appearance-none"
-                >
+              >
                 <option value="ADMIN">ADMIN</option>
                 <option value="TRAINER">TRAINER</option>
                 {/* Keeping MEMBER option hidden in UI for new creates as per instruction "Role has 2 options", 
                     but logic supports it if editing existing MEMBER */}
                 {editingMember && formData.role === 'MEMBER' && <option value="MEMBER">MEMBER</option>}
-                </select>
+              </select>
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1">Full Name</label>
             <input
@@ -250,82 +300,87 @@ export const Members: React.FC<MembersProps> = ({ members, packages, setMembers 
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-             <div>
-                <label className="block text-sm font-medium text-slate-400 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none"
-                />
-             </div>
-             <div>
-                <label className="block text-sm font-medium text-slate-400 mb-1">Phone</label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none"
-                />
-             </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-1">Email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-1">Phone</label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none"
+              />
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1">Password {editingMember && "(Leave blank to keep current)"}</label>
             <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none"
-                placeholder="••••••••"
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none"
+              placeholder="••••••••"
             />
           </div>
 
           <div className="border-t border-gym-800 pt-4 mt-2">
             <h3 className="text-sm font-semibold text-gym-400 mb-3">Gym Membership Details</h3>
             <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-slate-400 mb-1">Package</label>
-                    <select
-                    value={formData.packageId}
-                    onChange={(e) => setFormData({ ...formData, packageId: e.target.value })}
-                    className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none appearance-none"
-                    >
-                    <option value="">None</option>
-                    {packages.map(p => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-slate-400 mb-1">Status</label>
-                    <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as Member['status'] })}
-                    className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none appearance-none"
-                    >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="Pending">Pending</option>
-                    </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-1">Package</label>
+                <select
+                  value={formData.packageId}
+                  onChange={(e) => setFormData({ ...formData, packageId: e.target.value })}
+                  className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none appearance-none"
+                >
+                  <option value="">None</option>
+                  {packages.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-1">Status</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as Member['status'] })}
+                  className="w-full bg-gym-950 border border-gym-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-1 focus:ring-gym-500 focus:border-gym-500 outline-none appearance-none"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
             </div>
           </div>
 
           <div className="pt-4 flex justify-end space-x-3">
-             <button
-               onClick={() => setIsModalOpen(false)}
-               className="px-4 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-gym-800 transition-colors"
-             >
-               Cancel
-             </button>
-             <button
-               onClick={handleSave}
-               className="px-6 py-2 rounded-lg bg-gym-500 hover:bg-gym-400 text-white font-medium shadow-lg shadow-cyan-500/20 transition-all"
-             >
-               Save Member
-             </button>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="px-4 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-gym-800 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-6 py-2 rounded-lg bg-gym-500 hover:bg-gym-400 text-white font-medium shadow-lg shadow-cyan-500/20 transition-all"
+            >
+              Save Member
+            </button>
           </div>
+          {isLoading && (
+            <div className="absolute inset-0 bg-gym-950/50 flex items-center justify-center rounded-lg">
+              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
+          )}
         </div>
       </Modal>
     </div>
