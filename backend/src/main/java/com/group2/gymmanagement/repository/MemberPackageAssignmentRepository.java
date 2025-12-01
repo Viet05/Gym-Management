@@ -3,6 +3,7 @@ package com.group2.gymmanagement.repository;
 import com.group2.gymmanagement.entities.MemberPackageAssigment;
 
 import com.group2.gymmanagement.entities.User;
+import com.group2.gymmanagement.enums.PackageStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -12,5 +13,5 @@ public interface MemberPackageAssignmentRepository extends JpaRepository<MemberP
 
   List<MemberPackageAssigment> findByMember(User member);
 
-  List<MemberPackageAssigment> findByActiveStatus(Boolean activeStatus);
+  List<MemberPackageAssigment> findByActiveStatus(PackageStatus activeStatus);
 }

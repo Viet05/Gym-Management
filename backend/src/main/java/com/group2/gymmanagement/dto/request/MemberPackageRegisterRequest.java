@@ -1,7 +1,7 @@
 package com.group2.gymmanagement.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.group2.gymmanagement.enums.PackageStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,13 +13,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PackageUpdateRequest {
+public class MemberPackageRegisterRequest {
 
-  String name;
-  String durationMonth;
-  Double price;
-  String description;
-  PackageStatus active;
+  Long packageId;
+  LocalDateTime startDate;
 }

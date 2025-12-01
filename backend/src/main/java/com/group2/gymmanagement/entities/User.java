@@ -3,6 +3,7 @@ package com.group2.gymmanagement.entities;
 
 import com.group2.gymmanagement.enums.UserRole;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,4 +55,7 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated")
     private LocalDateTime updatedDate;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MemberPackageAssigment> memberPackageAssigments;
 }

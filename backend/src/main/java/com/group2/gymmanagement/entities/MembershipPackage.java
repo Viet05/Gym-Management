@@ -1,13 +1,21 @@
 package com.group2.gymmanagement.entities;
 
+import com.group2.gymmanagement.enums.PackageStatus;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,7 +48,8 @@ public class MembershipPackage implements Serializable {
   private String description;
 
   @Column(name = "active")
-  private String active;
+  @Enumerated(EnumType.STRING)
+  private PackageStatus active;
 
   @CreationTimestamp
   @Column(name = "created")
@@ -49,4 +58,7 @@ public class MembershipPackage implements Serializable {
   @UpdateTimestamp
   @Column(name = "updated")
   private LocalDateTime updatedDate;
+
+  @OneToMany(mappedBy = "membershipPackage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private List<MemberPackageAssigment> packageAssigments;
 }

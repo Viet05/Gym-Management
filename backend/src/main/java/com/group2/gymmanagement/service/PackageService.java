@@ -5,6 +5,7 @@ import com.group2.gymmanagement.dto.request.PackageCreateRequest;
 import com.group2.gymmanagement.dto.request.PackageUpdateRequest;
 import com.group2.gymmanagement.dto.response.PackageDTO;
 import com.group2.gymmanagement.entities.MembershipPackage;
+import com.group2.gymmanagement.enums.PackageStatus;
 import com.group2.gymmanagement.mapper.PackageMapper;
 import com.group2.gymmanagement.repository.MembershipPackageRepository;
 import java.util.List;
@@ -28,6 +29,7 @@ public class PackageService {
     }
 
     MembershipPackage pack = packageMapper.toMembershipPackage(request);
+    pack.setActive(PackageStatus.ACTIVE);
     packageRepo.save(pack);
 
     return packageMapper.toPackageDTO(pack);
