@@ -2,6 +2,7 @@ package com.group2.gymmanagement.service;
 
 import com.group2.gymmanagement.dto.request.MemberPackageRegisterRequest;
 import com.group2.gymmanagement.dto.response.MembershipPackageAssignmentDTO;
+import com.group2.gymmanagement.dto.response.PackageDTO;
 import com.group2.gymmanagement.entities.MemberPackageAssigment;
 import com.group2.gymmanagement.entities.MembershipPackage;
 import com.group2.gymmanagement.entities.User;
@@ -43,10 +44,32 @@ public class MemberService {
         .membershipPackage(packages)
         .startDate(request.getStartDate())
         .endDate(endDate)
-        .activeStatus(PackageStatus.ACTIVE)
+        .activeStatus(PackageStatus.PENDING)
         .build();
     assignmentRepository.save(assignment);
 
     return mapper.toDTO(assignment);
+  }
+
+  public MembershipPackageAssignmentDTO cancelPackage(Long memberId, Long packageId) {
+
+    User member = userRepository.findById(memberId).orElseThrow(
+        () -> new IllegalArgumentException("Invalid member id: " + memberId)
+    );
+
+    MembershipPackage packages = packageRepository.findById(packageId).orElseThrow(
+        () -> new IllegalArgumentException("Invalid package id: " + packageId)
+    );
+
+    MemberPackageAssigment assigment = assignmentRepository
+        .findByMemberAndMembershipPackageAndActiveStatus(member, packages, PackageStatus.ACTIVE).orElseThrow(
+            () -> new IllegalArgumentException("The package is not active or does not exist")
+    );
+
+    assigment.setActiveStatus(PackageStatus.CANCEL);
+    assigment.setEndDate(LocalDateTime.now());
+
+    assignmentRepository.save(assigment);
+    return mapper.toDTO(assigment);
   }
 }
