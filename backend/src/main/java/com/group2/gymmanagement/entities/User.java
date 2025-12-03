@@ -1,9 +1,9 @@
 package com.group2.gymmanagement.entities;
 
-
 import com.group2.gymmanagement.enums.UserRole;
 import jakarta.persistence.*;
 import java.util.List;
+import com.group2.gymmanagement.entities.Subscription;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name="user")
+@Table(name = "user")
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,13 +23,13 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="user_id")
+    @Column(name = "user_id")
     private Long id;
 
-    @Column(name="username",nullable = false)
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name="password",nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "email")
@@ -57,5 +57,5 @@ public class User {
     private LocalDateTime updatedDate;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<MemberPackageAssigment> memberPackageAssigments;
+    private List<Subscription> subscriptions;
 }

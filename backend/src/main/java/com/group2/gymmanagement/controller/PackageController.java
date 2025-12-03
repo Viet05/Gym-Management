@@ -4,7 +4,7 @@ import com.group2.gymmanagement.dto.request.PackageCreateRequest;
 import com.group2.gymmanagement.dto.request.PackageUpdateRequest;
 import com.group2.gymmanagement.dto.response.ApiResponse;
 import com.group2.gymmanagement.dto.response.PackageDTO;
-import com.group2.gymmanagement.service.PackageService;
+import com.group2.gymmanagement.service.GymPlanService;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasRole('ADMIN')")
 public class PackageController {
 
-  PackageService packageService;
+  GymPlanService planService;
 
   @PostMapping("/pakages")
   public ApiResponse<PackageDTO> createPackage(@RequestBody PackageCreateRequest request) {
     return ApiResponse.<PackageDTO>builder()
         .code(200)
         .message("Create success")
-        .data(packageService.createPackage(request))
+        .data(planService.create(request))
         .build();
   }
 
@@ -42,7 +42,7 @@ public class PackageController {
     return ApiResponse.<PackageDTO>builder()
         .code(200)
         .message("Update success")
-        .data(packageService.updatePackage(id, request))
+        .data(planService.update(id, request))
         .build();
   }
 
@@ -51,13 +51,13 @@ public class PackageController {
     return ApiResponse.<List<PackageDTO>>builder()
         .code(200)
         .message("Success")
-        .data(packageService.getPackage())
+        .data(planService.getAll())
         .build();
   }
 
   @DeleteMapping("/pakages/{id}")
   public String deletePackage(@PathVariable Long id) {
-    packageService.deletePackage(id);
+    planService.delete(id);
     return "Delete success";
   }
 }

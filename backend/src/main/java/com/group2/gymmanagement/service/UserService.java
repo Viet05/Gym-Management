@@ -4,11 +4,11 @@ import com.group2.gymmanagement.Specification.UserSpecification;
 import com.group2.gymmanagement.dto.request.UserCreateRequest;
 import com.group2.gymmanagement.dto.request.UserUpdateRequest;
 import com.group2.gymmanagement.dto.response.UserDTO;
-import com.group2.gymmanagement.entities.TrainerProfile;
+import com.group2.gymmanagement.entities.Trainer;
 import com.group2.gymmanagement.entities.User;
 import com.group2.gymmanagement.enums.UserRole;
 import com.group2.gymmanagement.mapper.UserMapper;
-import com.group2.gymmanagement.repository.TrainerProfileRepository;
+import com.group2.gymmanagement.repository.TrainerRepository;
 import com.group2.gymmanagement.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class UserService {
   UserMapper userMapper;
   UserSpecification userSpecification;
   PasswordEncoder passwordEncoder;
-  TrainerProfileRepository trainerProfileRepository;
+  TrainerRepository trainerRepo;
 
   public UserDTO createUser(UserCreateRequest request) {
 
@@ -49,12 +49,12 @@ public class UserService {
     user = userRepository.save(user);
 
     if (user.getRole() == UserRole.TRAINER) {
-      TrainerProfile profile = TrainerProfile.builder()
+      Trainer profile = Trainer.builder()
           .user(user)
-          .completed(false)
-          .experienceYears(0)
+          .isCompleted(false)
+          .experience(0)
           .build();
-      trainerProfileRepository.save(profile);
+      trainerRepo.save(profile);
     }
 
     return userMapper.toUserDTO(user);
@@ -85,8 +85,8 @@ public class UserService {
   }
 
   public void deleteUser(Long id) {
-    if (trainerProfileRepository.existsById(id)) {
-      trainerProfileRepository.deleteById(id);
+    if (trainerRepo.existsById(id)) {
+      trainerRepo.deleteById(id);
     }
     userRepository.deleteById(id);
   }

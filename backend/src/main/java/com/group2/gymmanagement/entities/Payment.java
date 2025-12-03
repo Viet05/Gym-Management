@@ -26,7 +26,7 @@ public class Payment {
   private Long paymentId;
 
   @ManyToOne
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "user_id", referencedColumnName = "user_id")
   private User member;
 
   @Column(name = "amount")
@@ -41,4 +41,3 @@ public class Payment {
   @Column(name = "reference")
   private String reference;
 }
-
