@@ -1,13 +1,17 @@
 package com.group2.gymmanagement.entities;
 
+import com.group2.gymmanagement.enums.PaymentStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,18 +30,38 @@ public class Payment {
   private Long paymentId;
 
   @ManyToOne
-  @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+  @JoinColumn(name = "user_id")
   private User member;
 
-  @Column(name = "amount")
-  private Double amount;
+  @ManyToOne
+  @JoinColumn(name = "id")
+  private Subscription subscription;
 
-  @Column(name = "payment_date")
-  private String paymentDate;
+  @Column(nullable = false)
+  private Long amount;
 
-  @Column(name = "method")
+  @Column
+  private LocalDateTime paymentDate;
+
+  @Column
   private String method;
 
-  @Column(name = "reference")
+  @Column(unique = true)
   private String reference;
+
+  @Column
+  private String transactionNo;
+
+  @Column
+  private String bankCode;
+
+  @Column
+  private String responseCode;
+
+  @Enumerated(EnumType.STRING)
+  private PaymentStatus status;
+
+  @Column(columnDefinition = "TEXT")
+  private String rawData;
 }
+

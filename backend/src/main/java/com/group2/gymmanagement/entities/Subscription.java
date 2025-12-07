@@ -3,6 +3,7 @@ package com.group2.gymmanagement.entities;
 import com.group2.gymmanagement.enums.PackageStatus;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,8 +25,12 @@ public class Subscription {
     private User member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plan_id", nullable = false)
+    @JoinColumn(name = "id", nullable = false)
     private GymPlan gymPlan;
+
+    @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
+    private List<Payment> paymentList;
+
 
     @Column(name = "start_date")
     private LocalDate startDate;

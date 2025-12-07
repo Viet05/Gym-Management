@@ -27,7 +27,7 @@ public class Attendance {
   private Long attendanceId;
 
   @ManyToOne
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "user_id")
   private User member;
 
   @ManyToOne

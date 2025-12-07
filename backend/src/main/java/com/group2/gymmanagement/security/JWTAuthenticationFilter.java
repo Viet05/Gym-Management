@@ -31,37 +31,40 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request,
       HttpServletResponse response,
-      FilterChain filterChain
-  ) throws ServletException, IOException {
+      FilterChain filterChain) throws ServletException, IOException {
 
     try {
-      //Lấy token từ header Authorization
+      // Lấy token từ header Authorization
       String token = getJwtFromRequest(request);
 
       if (token != null && jwtUtils.validateToken(token)) {
 
-        //Lấy username từ token
+        // Lấy username từ token
         String username = jwtUtils.getUsernameFromToken(token);
 
-        //security chưa được set cho request
+        // security chưa được set cho request
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
           // Load user từ DB
           UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-          //Tạo authentication object
-          UsernamePasswordAuthenticationToken authentication =
-              new UsernamePasswordAuthenticationToken(
-                  userDetails,
-                  null,
-                  userDetails.getAuthorities()
-              );
+          // Tạo authentication object
+          /**
+           * Vì Spring Security làm việc với SpringSecurityContext mà trong đó phải có
+           * authentication object.
+           * Vì vậy ta tạo authentication object từ UserDetails.
+           * Sau đó ta set vào SecurityContext để Spring Security biết user nào đang gọi
+           * API.
+           */
+          UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+              userDetails,
+              null,
+              userDetails.getAuthorities());
 
           authentication.setDetails(
-              new WebAuthenticationDetailsSource().buildDetails(request)
-          );
+              new WebAuthenticationDetailsSource().buildDetails(request));
 
-          //Set vào SecurityContext để Spring Security biết user nào đang gọi API
+          // Set vào SecurityContext để Spring Security biết user nào đang gọi API
           SecurityContextHolder.getContext().setAuthentication(authentication);
         }
       }
@@ -70,7 +73,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
       e.printStackTrace();
     }
 
-    //Cho request đi tiếp
+    // Cho request đi tiếp
     filterChain.doFilter(request, response);
   }
 
