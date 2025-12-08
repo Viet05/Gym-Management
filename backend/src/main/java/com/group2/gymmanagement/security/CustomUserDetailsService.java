@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+/**
+ * CustomUserDetailsService là một implementation của UserDetailsService.
+ * Nó chịu trách nhiệm tìm kiếm user trong database và trả về UserDetails.
+ */
 public class CustomUserDetailsService implements UserDetailsService {
 
   UserRepository userRepository;
@@ -22,7 +26,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     User user = userRepository.findByUsername(username)
         .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-
+    
+        //Convert entity User thành UserDetails để Spring Security hiểu được.
     return new CustomUserDetails(user);
   }
 }

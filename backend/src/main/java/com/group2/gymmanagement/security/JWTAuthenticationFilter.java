@@ -59,7 +59,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
           UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
               userDetails,
               null,
-              userDetails.getAuthorities());
+              userDetails.getAuthorities()); // Đây là lúc lấy role để sử dụng cho Security ở config và controller
 
           authentication.setDetails(
               new WebAuthenticationDetailsSource().buildDetails(request));

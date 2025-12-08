@@ -1,4 +1,4 @@
-package com.group2.gymmanagement.config;
+package com.group2.gymmanagement.config.Security;
 
 import com.group2.gymmanagement.security.CustomUserDetailsService;
 import com.group2.gymmanagement.security.JWTAuthenticationFilter;
@@ -8,7 +8,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

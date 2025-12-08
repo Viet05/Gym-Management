@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1:3307/GymDB
-    username: root
-    password: root
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -12,11 +12,18 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
 
 jwt:
-  secret: KJ5V7oXO1ddz_utM0Y1ATqa9klyETrc6z9SRjrOB87k
+  secret: ${JWT_SECRET}
 
 vnpay:
-  url: https://sandbox.vnpayment.vn/vpcpay.html
-  returnUrl: https://yourdomain.com/payments/vnpay/return
-  notifyUrl: https://yourdomain.com/payments/vnpay/ipn
-  tmnCode: "99M6VKL1"
-  hashSecret: "HXT6A4JBHBEZVGZMZSCYQI3FSO8M1557"
+  url: ${VNPAY_URL}
+  return-url: ${VNPAY_RETURN_URL}
+  ipn-url: ${VNPAY_IPN_URL}
+  tmn-code: ${VNPAY_TMN_CODE}
+  hash-secret: ${VNPAY_HASH_SECRET}
+  version: ${VNPAY_VERSION:2.1.0}
+  command: ${VNPAY_COMMAND:pay}
+  curr-code: ${VNPAY_CURR_CODE:VND}
+  locale: ${VNPAY_LOCALE:vn}
+  expire-minutes: ${VNPAY_EXPIRE_MINUTES:15}
+  time-zone: ${VNPAY_TIME_ZONE:Asia/Ho_Chi_Minh}
+

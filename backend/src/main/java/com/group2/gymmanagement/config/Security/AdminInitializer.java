@@ -1,4 +1,4 @@
-package com.group2.gymmanagement.config;
+package com.group2.gymmanagement.config.Security;
 
 
 import com.group2.gymmanagement.entities.User;

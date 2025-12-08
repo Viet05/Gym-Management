@@ -6,6 +6,7 @@ import com.group2.gymmanagement.entities.User;
 import com.group2.gymmanagement.enums.PaymentStatus;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,7 +21,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
   Optional<Payment> findByReference(String reference);
 
-  Optional<Payment> findBySubscription(Subscription subscription);
+  Optional<Payment> findBySubscriptionId(Long subscriptionId);
 
   List<Payment> findByStatus(PaymentStatus status);
+
+  Optional<Payment> findByTransactionNo(String transactionNo);
 }
