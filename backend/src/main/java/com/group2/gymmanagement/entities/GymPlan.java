@@ -27,7 +27,7 @@ public class GymPlan {
     private Integer duration;
 
     @Column(nullable = false)
-    private Double price;
+    private Long price;
 
     private Integer status; // 1: Active, 0: Inactive
 }
