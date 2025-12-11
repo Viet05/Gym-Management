@@ -3,14 +3,21 @@ package com.group2.gymmanagement.service;
 import com.group2.gymmanagement.config.Payment.VnpayUtils;
 import com.group2.gymmanagement.dto.request.PaymentRequest;
 import com.group2.gymmanagement.dto.response.CreatePaymentResponse;
+import com.group2.gymmanagement.dto.response.PaymentVerifyResult;
 import com.group2.gymmanagement.entities.Payment;
 import com.group2.gymmanagement.entities.Subscription;
+import com.group2.gymmanagement.entities.User;
+import com.group2.gymmanagement.enums.PackageStatus;
+import com.group2.gymmanagement.enums.PaymentProvider;
 import com.group2.gymmanagement.enums.PaymentStatus;
 import com.group2.gymmanagement.repository.PaymentRepository;
 import com.group2.gymmanagement.repository.SubscriptionRepository;
 import com.group2.gymmanagement.service.payment.PaymentGateway;
 import com.group2.gymmanagement.service.payment.PaymentGatewayFactory;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,18 +36,63 @@ public class PaymentService {
   SubscriptionRepository subscriptionRepository;
   VnpayUtils utils;
 
-  public CreatePaymentResponse createPayment(PaymentRequest paymentRequest, HttpServletRequest request) {
+  public CreatePaymentResponse createPayment(PaymentRequest paymentRequest,
+      HttpServletRequest request,
+      User currUser) {
     PaymentGateway gateway = gatewayFactory.getGateway(paymentRequest.getProvider());
-
+    String clientIp = utils.getClientIp(request);
     Subscription subscription = findSubscription(paymentRequest.getSubscriptionId());
+
+    Optional<Payment> existingPayment = paymentRepository
+        .findBySubscriptionAndStatus(subscription, PaymentStatus.PENDING);
+
+    if (!subscription.getMember().getId().equals(currUser.getId())) {
+      throw new RuntimeException("Invalid subscription");
+    }
+
+    if (existingPayment.isPresent()) {
+      Payment payment = existingPayment.get();
+
+      String paymentUrl = gateway.createPaymentUrl(
+          payment.getAmount(),
+          payment.getReference(),
+          clientIp
+      );
+      return buildResponse(payment, payment.getReference(), paymentUrl, gateway.getProviderName());
+    }
 
     String txnRef = utils.randomTxnRef();
     Payment payment = createPendingPayment(subscription, txnRef);
 
-    String clientIp = utils.getClientIp(request);
     String paymentUrl = gateway.createPaymentUrl(payment.getAmount(), txnRef, clientIp);
 
     return buildResponse(payment, txnRef, paymentUrl, gateway.getProviderName());
+  }
+
+  public PaymentVerifyResult callBack(String provider, Map<String, String> params) {
+    PaymentProvider paymentProvider = PaymentProvider.valueOf(provider.toUpperCase());
+    PaymentGateway gateway = gatewayFactory.getGateway(paymentProvider);
+    PaymentVerifyResult result = gateway.verifyCallback(params);
+
+    if (result.isSuccess()) {
+      Payment payments = paymentRepository.findByReference(result.getTxnRef()).orElseThrow(
+          () -> new RuntimeException("Payment not found")
+      );
+
+      if (payments.getStatus() != PaymentStatus.SUCCESS) {
+        payments.setStatus(PaymentStatus.SUCCESS);
+        paymentRepository.save(payments);
+      }
+
+      Subscription subscription = payments.getSubscription();
+      subscription.setStatus(PackageStatus.ACTIVE);
+      subscription.setStartDate(LocalDate.now());
+      subscription.setEndDate(LocalDate.now().plusMonths(1));
+
+      subscriptionRepository.save(subscription);
+    }
+
+    return result;
   }
 
   private Subscription findSubscription(Long subscriptionId) {

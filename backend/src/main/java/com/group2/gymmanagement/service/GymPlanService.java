@@ -13,9 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for managing gym plans/packages.
- */
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -24,9 +22,7 @@ public class GymPlanService {
     GymPlanRepository planRepo;
     PackageMapper mapper;
 
-    /**
-     * Creates a new gym plan.
-     */
+
     public PackageDTO create(PackageCreateRequest request) {
         if (planRepo.existsByName(request.getName())) {
             throw new RuntimeException("Plan name already exists");
@@ -39,9 +35,7 @@ public class GymPlanService {
         return mapper.toPackageDTO(plan);
     }
 
-    /**
-     * Updates an existing gym plan.
-     */
+
     public PackageDTO update(Long id, PackageUpdateRequest request) {
         GymPlan plan = planRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
@@ -53,17 +47,13 @@ public class GymPlanService {
         return mapper.toPackageDTO(updated);
     }
 
-    /**
-     * Retrieves all gym plans.
-     */
+
     public List<PackageDTO> getAll() {
         List<GymPlan> plans = planRepo.findAll();
         return mapper.toPackageDTOList(plans);
     }
 
-    /**
-     * Deletes a gym plan by ID.
-     */
+
     public void delete(Long id) {
         planRepo.deleteById(id);
     }

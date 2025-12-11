@@ -25,12 +25,11 @@ public class Subscription {
     private User member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "gym_plan_id", nullable = false)
     private GymPlan gymPlan;
 
     @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
     private List<Payment> paymentList;
-
 
     @Column(name = "start_date")
     private LocalDate startDate;

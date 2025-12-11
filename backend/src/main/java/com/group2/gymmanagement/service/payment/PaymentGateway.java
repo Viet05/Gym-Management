@@ -9,7 +9,7 @@ public interface PaymentGateway {
 
     String createPaymentUrl(Long amount, String txnRef, String clientIp);
 
-//    PaymentVerifyResult verifyCallback(Map<String, String> params);
+    PaymentVerifyResult verifyCallback(Map<String, String> params);
 
     String getProviderName();
 

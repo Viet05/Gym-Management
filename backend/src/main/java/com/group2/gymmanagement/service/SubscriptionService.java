@@ -15,12 +15,12 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for managing member subscriptions to gym plans.
- */
+
 @Service
+@PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SubscriptionService {
@@ -30,9 +30,7 @@ public class SubscriptionService {
         GymPlanRepository planRepo;
         MemberPackageMapper mapper;
 
-        /**
-         * Registers a member for a gym plan.
-         */
+
         public MembershipPackageAssignmentDTO register(Long memberId, MemberPackageRegisterRequest request) {
                 // Find member
                 User member = userRepo.findById(memberId)
@@ -59,9 +57,7 @@ public class SubscriptionService {
                 return mapper.toDTO(subscription);
         }
 
-        /**
-         * Cancels an active subscription for a member.
-         */
+
         public MembershipPackageAssignmentDTO cancel(Long memberId, Long planId) {
                 // Find member
                 User member = userRepo.findById(memberId)
@@ -84,9 +80,7 @@ public class SubscriptionService {
                 return mapper.toDTO(subscription);
         }
 
-        /**
-         * Gets all active subscriptions for a member.
-         */
+
         public List<MembershipPackageAssignmentDTO> getActive(Long memberId) {
                 // Find member
                 User member = userRepo.findById(memberId)
