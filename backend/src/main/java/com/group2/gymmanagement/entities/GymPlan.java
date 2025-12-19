@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 public class GymPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "gym_plan_id")
+    private Long gymPlanId;
 
     @Column(nullable = false)
     private String name;

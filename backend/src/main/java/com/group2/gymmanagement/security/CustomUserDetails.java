@@ -11,7 +11,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * 1. Spring Security ko làm việc với User Entity nên ta tạo CustomUserDetails để
+ * 1. Spring Security ko làm việc với User Entity nên ta tạo CustomUserDetails
+ * để
  * chuyển đổi User Entity thành UserDetails.
  * 2. UserDetails là interface của Spring Security.
  */
@@ -24,7 +25,8 @@ public class CustomUserDetails implements UserDetails {
    * 1. Lấy role từ User Entity
    * Chuyển đổi thànhGrantedAuthority.
    * 2. Trả về collection chứa GrantedAuthority.
-   * 3. Vì Spring Security làm việc vớiGrantedAuthority nên ta chuyển đổi role thànhGrantedAuthority.
+   * 3. Vì Spring Security làm việc vớiGrantedAuthority nên ta chuyển đổi role
+   * thànhGrantedAuthority.
    */
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -63,6 +65,6 @@ public class CustomUserDetails implements UserDetails {
   }
 
   public Long getId() {
-    return user.getId();
+    return user.getUserId();
   }
 }

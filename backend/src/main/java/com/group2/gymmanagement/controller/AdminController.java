@@ -4,12 +4,13 @@ import com.group2.gymmanagement.dto.request.UserCreateRequest;
 import com.group2.gymmanagement.dto.request.UserUpdateRequest;
 import com.group2.gymmanagement.dto.response.ApiResponse;
 import com.group2.gymmanagement.dto.response.UserDTO;
+import com.group2.gymmanagement.repository.PaymentRepository;
 import com.group2.gymmanagement.service.UserService;
-import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.group2.gymmanagement.dto.response.DashboardStatsDTO;
 import com.group2.gymmanagement.enums.UserRole;
 import com.group2.gymmanagement.repository.AttendanceRepository;
-import com.group2.gymmanagement.repository.PaymentRepository;
+
 import com.group2.gymmanagement.repository.UserRepository;
 
 @RestController
@@ -58,8 +59,10 @@ public class AdminController {
   }
 
   @GetMapping(value = "/users")
-  public ApiResponse<List<UserDTO>> getAllUsers(@RequestParam Map<String, Object> request) {
-    return ApiResponse.<List<UserDTO>>builder()
+  public ApiResponse<Page<UserDTO>> getAllUsers(
+      @RequestParam Map<String, Object> request) {
+
+    return ApiResponse.<Page<UserDTO>>builder()
         .code(200)
         .message("Success")
         .data(userService.getUser(request))

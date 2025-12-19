@@ -35,11 +35,18 @@ public class VnpayService implements PaymentGateway {
 
     @Override
     public String createPaymentUrl(Long amount, String txnRef, String clientIp) {
+
         Map<String, String> params = buildParams(amount, txnRef, clientIp);
+
+
         String query = utils.buildQuery(params);
+
+
         String secureHash = utils.hmacSHA512(query);
+
         return config.getUrl() + "?" + query + "&vnp_SecureHash=" + secureHash;
     }
+
 
     @Override
     public PaymentVerifyResult verifyCallback(Map<String, String> params) {
@@ -52,7 +59,7 @@ public class VnpayService implements PaymentGateway {
         String query = utils.buildQuery(paramsMap);
         String secureHash = utils.hmacSHA512(query);
 
-        boolean isValidSecureHash = utils.hmacSHA512(secureHash).equals(vnpSecureHash);
+        boolean isValidSecureHash = secureHash.equals(vnpSecureHash);
         String responseCode = params.get("vnp_ResponseCode");
         boolean isSuccess = isValidSecureHash && "00".equals(responseCode);
 
@@ -83,25 +90,35 @@ public class VnpayService implements PaymentGateway {
     private Map<String, String> buildParams(Long amount, String txnRef, String clientIp) {
 
         Map<String, String> params = new TreeMap<>();
-        params.put("vnp_Version", config.getVersion());
-        params.put("vnp_Command", config.getCommand());
+        params.put("vnp_Version", "2.1.0");
+        params.put("vnp_Command", "pay");
         params.put("vnp_TmnCode", config.getTmnCode());
-        params.put("vnp_CurrCode", "VND");
         params.put("vnp_Amount", String.valueOf(amount * 100));
+        params.put("vnp_CurrCode", "VND");
         params.put("vnp_TxnRef", txnRef);
         params.put("vnp_OrderInfo", "Payment for order #" + txnRef);
-        params.put("vnp_OrderType", config.getCurrCode());
-        params.put("vnp_IpAddr", clientIp);
+
+
+        params.put("vnp_OrderType", "other");
+
         params.put("vnp_Locale", "vn");
+        params.put("vnp_IpAddr", clientIp);
         params.put("vnp_ReturnUrl", config.getReturnUrl());
 
-        String createDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+
+        String createDate = LocalDateTime.now()
+            .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         params.put("vnp_CreateDate", createDate);
 
-        String expireDate = String.valueOf(LocalDateTime.now().plusMinutes(15));
+
+        String expireDate = LocalDateTime.now()
+            .plusMinutes(15)
+            .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        params.put("vnp_ExpireDate", expireDate);
 
         return params;
     }
+
 
 
     private Long parseLong(String value) {

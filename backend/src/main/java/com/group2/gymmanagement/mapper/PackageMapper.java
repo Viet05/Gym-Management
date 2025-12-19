@@ -11,9 +11,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-/**
- * Mapper for GymPlan entity.
- */
 @Mapper(componentModel = "spring")
 public interface PackageMapper {
 
@@ -28,7 +25,7 @@ public interface PackageMapper {
 
   // Update entity from request
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "gymPlanId", ignore = true)
   @Mapping(source = "durationMonth", target = "duration")
   GymPlan toMembershipPackageUpdate(PackageUpdateRequest request, @MappingTarget GymPlan target);
 

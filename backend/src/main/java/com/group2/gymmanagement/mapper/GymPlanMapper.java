@@ -11,9 +11,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-/**
- * Mapper for converting between GymPlan entities and DTOs.
- */
 @Mapper(componentModel = "spring")
 public interface GymPlanMapper {
 
@@ -25,7 +22,7 @@ public interface GymPlanMapper {
 
     // Update existing entity from request
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "gymPlanId", ignore = true)
     GymPlan update(PackageUpdateRequest request, @MappingTarget GymPlan target);
 
     // Convert list of entities to DTOs

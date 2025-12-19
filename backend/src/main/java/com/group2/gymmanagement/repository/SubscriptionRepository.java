@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
-    List<Subscription> findByMemberId(Long memberId);
+    List<Subscription> findByMemberUserId(Long memberId);
 
     List<Subscription> findByStatus(PackageStatus status);
 
@@ -19,5 +19,5 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     List<Subscription> findByMember(User member);
 
-    Optional<Subscription> findSubscriptionById(Long id);
+    Optional<Subscription> findSubscriptionBySubscriptionId(Long id);
 }

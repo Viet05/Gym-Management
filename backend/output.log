@@ -1,0 +1,60 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.group2:gymmanagement >----------------------
+[INFO] Building gymmanagement 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ gymmanagement ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ gymmanagement ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 65 source files with javac [debug release 21] to target\classes
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/dto/response/AuthResponse.java:[15,18] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/dto/request/PaymentRequest.java:[21,20] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/PackageMapper.java:[20,11] Unmapped target properties: "gymPlanId, status".
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/PackageMapper.java:[25,14] Unmapped target properties: "id, createdDate, updatedDate".
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/GymPlanMapper.java:[19,13] Unmapped target properties: "gymPlanId, duration, status".
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/GymPlanMapper.java:[22,16] Unmapped target properties: "id, durationMonth, active, createdDate, updatedDate".
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/UserMapper.java:[19,9] Unmapped target properties: "userId, status, createdDate, updatedDate, subscriptions".
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/UserMapper.java:[22,12] Unmapped target property: "id".
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/UserMapper.java:[31,9] Unmapped target properties: "userId, role, status, createdDate, updatedDate, subscriptions".
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/PaymentMapper.java:[10,25] Unmapped target properties: "paymentUrl, paymentReference, currency, subscriptionId, provider".
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/MemberPackageMapper.java:[14,34] Unmapped target properties: "id, memberId, packageId".
+[WARNING] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/MemberPackageMapper.java:[17,40] Unmapped target properties: "id, memberId, packageId, startDate, endDate". Mapping from Collection element "GymPlan gymPlan" to "MembershipPackageAssignmentDTO membershipPackageAssignmentDTO".
+[INFO] 12 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/SubscriptionMapper.java:[18,36] No property named "member.id" exists in source parameter(s). Did you mean "member.email"?
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/SubscriptionMapper.java:[18,36] No property named "gymPlan.id" exists in source parameter(s). Did you mean "gymPlan.name"?
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/PackageMapper.java:[31,11] Unknown property "gym_plan_id" in result type GymPlan. Did you mean "gymPlanId"?
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/GymPlanMapper.java:[26,23] Unknown property "gym_plan_id" in result type GymPlan. Did you mean "gymPlanId"?
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/UserMapper.java:[25,22] Unknown property "user_id" in result type User. Did you mean "userId"?
+[INFO] 5 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.325 s
+[INFO] Finished at: 2025-12-12T20:24:04+07:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project gymmanagement: Compilation failure: Compilation failure: 
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/SubscriptionMapper.java:[18,36] No property named "member.id" exists in source parameter(s). Did you mean "member.email"?
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/SubscriptionMapper.java:[18,36] No property named "gymPlan.id" exists in source parameter(s). Did you mean "gymPlan.name"?
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/PackageMapper.java:[31,11] Unknown property "gym_plan_id" in result type GymPlan. Did you mean "gymPlanId"?
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/GymPlanMapper.java:[26,23] Unknown property "gym_plan_id" in result type GymPlan. Did you mean "gymPlanId"?
+[ERROR] /D:/gym-management/backend/src/main/java/com/group2/gymmanagement/mapper/UserMapper.java:[25,22] Unknown property "user_id" in result type User. Did you mean "userId"?
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

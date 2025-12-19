@@ -38,7 +38,7 @@ public class JwtUtils {
             .plus(3, ChronoUnit.HOURS)
             .toEpochMilli()))
         .claim("role", user.getRole().name())
-        .claim("userId", user.getId())
+        .claim("userId", user.getUserId())
         .build();
 
     JWSObject jwsObject = new JWSObject(header, new Payload(claimsSet.toJSONObject()));

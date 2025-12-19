@@ -6,15 +6,13 @@ import com.group2.gymmanagement.entities.GymPlan;
 import java.util.List;
 import org.mapstruct.Mapper;
 
-/**
- * Mapper for converting between Subscription entities and DTOs.
- */
+
 @Mapper(componentModel = "spring")
 public interface SubscriptionMapper {
 
     // Convert entity to DTO
-    @org.mapstruct.Mapping(source = "member.id", target = "memberId")
-    @org.mapstruct.Mapping(source = "gymPlan.id", target = "packageId")
+    @org.mapstruct.Mapping(source = "member.userId", target = "memberId")
+    @org.mapstruct.Mapping(source = "gymPlan.gymPlanId", target = "packageId")
     MembershipPackageAssignmentDTO toDTO(Subscription subscription);
 
     // Convert list of plans to DTOs

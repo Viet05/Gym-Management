@@ -45,7 +45,7 @@ public class AuthenService {
     return new AuthResponse(
         token,
         "Bearer",
-        user.getId(),
+        user.getUserId(),
         user.getUsername());
   }
 
@@ -65,7 +65,7 @@ public class AuthenService {
     return new AuthResponse(
         token,
         "Bearer",
-        user.getId(),
+        user.getUserId(),
         user.getUsername());
   }
 }

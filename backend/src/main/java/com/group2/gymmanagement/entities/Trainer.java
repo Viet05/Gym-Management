@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "trainer_id")
+    private Long trainerId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")

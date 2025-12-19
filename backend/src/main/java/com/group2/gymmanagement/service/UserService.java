@@ -15,6 +15,7 @@ import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,14 +43,16 @@ public class UserService {
     user.setPassword(passwordEncoder.encode(request.getPassword()));
 
     if (request.getRole() == null)
-      user.setRole(UserRole.MEMBER);
+      user
+          .setRole(UserRole.MEMBER);
 
     user.setStatus("1");
 
     user = userRepository.save(user);
 
     if (user.getRole() == UserRole.TRAINER) {
-      Trainer profile = Trainer.builder()
+      Trainer profile = Trainer
+          .builder()
           .user(user)
           .isCompleted(false)
           .experience(0)
@@ -62,26 +65,44 @@ public class UserService {
 
   public UserDTO updateUser(Long id, UserUpdateRequest request) {
 
-    User user = userRepository.findById(id)
+    User user = userRepository
+        .findById(id)
         .orElseThrow(() -> new RuntimeException("User not found"));
 
-    if (!user.getEmail().equals(request.getEmail()) &&
-        userRepository.existsByEmail(request.getEmail())) {
+    if (!user.getEmail()
+        .equals(request.getEmail()) &&
+        userRepository
+            .existsByEmail(request
+                .getEmail())) {
       throw new RuntimeException("Email already exists");
     }
 
     userMapper.updateUser(request, user);
 
     if (request.getPassword() != null && !request.getPassword().isBlank()) {
-      user.setPassword(passwordEncoder.encode(request.getPassword()));
+      user
+          .setPassword(passwordEncoder
+              .encode(request
+                  .getPassword()));
     }
 
     return userMapper.toUserDTO(userRepository.save(user));
   }
 
-  public List<UserDTO> getUser(Map<String, Object> request) {
-    List<User> users = userSpecification.getUsersByFilter(request);
-    return userMapper.toListUserDTO(users);
+  public Page<UserDTO> getUser(Map<String, Object> request) {
+
+    int page = request.containsKey("page")
+        ? Integer.parseInt(request.get("page").toString())
+        : 1;
+    int size = request.containsKey("size")
+        ? Integer.parseInt(request.get("size").toString())
+        : 0;
+    Page<User> users = userSpecification
+        .getUsersByFilter(request
+            ,page
+            ,size);
+    return users
+        .map(userMapper::toUserDTO);
   }
 
   public void deleteUser(Long id) {

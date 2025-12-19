@@ -36,9 +36,11 @@ public class PaymentService {
   SubscriptionRepository subscriptionRepository;
   VnpayUtils utils;
 
+  //Create Payment
   public CreatePaymentResponse createPayment(PaymentRequest paymentRequest,
       HttpServletRequest request,
       User currUser) {
+
     PaymentGateway gateway = gatewayFactory.getGateway(paymentRequest.getProvider());
     String clientIp = utils.getClientIp(request);
     Subscription subscription = findSubscription(paymentRequest.getSubscriptionId());
@@ -46,7 +48,7 @@ public class PaymentService {
     Optional<Payment> existingPayment = paymentRepository
         .findBySubscriptionAndStatus(subscription, PaymentStatus.PENDING);
 
-    if (!subscription.getMember().getId().equals(currUser.getId())) {
+    if (!subscription.getMember().getUserId().equals(currUser.getUserId())) {
       throw new RuntimeException("Invalid subscription");
     }
 
@@ -69,26 +71,37 @@ public class PaymentService {
     return buildResponse(payment, txnRef, paymentUrl, gateway.getProviderName());
   }
 
+  //Callback
   public PaymentVerifyResult callBack(String provider, Map<String, String> params) {
+
+    PaymentProvider paymentProvider = PaymentProvider.valueOf(provider.toUpperCase());
+    PaymentGateway gateway = gatewayFactory.getGateway(paymentProvider);
+
+    return gateway.verifyCallback(params);
+  }
+
+  //IPN
+  public PaymentVerifyResult handleIpn(String provider, Map<String, String> params) {
+
     PaymentProvider paymentProvider = PaymentProvider.valueOf(provider.toUpperCase());
     PaymentGateway gateway = gatewayFactory.getGateway(paymentProvider);
     PaymentVerifyResult result = gateway.verifyCallback(params);
 
     if (result.isSuccess()) {
-      Payment payments = paymentRepository.findByReference(result.getTxnRef()).orElseThrow(
-          () -> new RuntimeException("Payment not found")
-      );
+      throw new RuntimeException("Invalid IPN");
+    }
 
-      if (payments.getStatus() != PaymentStatus.SUCCESS) {
-        payments.setStatus(PaymentStatus.SUCCESS);
-        paymentRepository.save(payments);
-      }
+    Payment payment = paymentRepository.findByReference(result.getTxnRef())
+        .orElseThrow(() -> new RuntimeException("Invalid IPN"));
 
-      Subscription subscription = payments.getSubscription();
-      subscription.setStatus(PackageStatus.ACTIVE);
+    if (payment.getStatus() != PaymentStatus.SUCCESS) {
+      payment.setStatus(PaymentStatus.SUCCESS);
+      paymentRepository.save(payment);
+
+      Subscription subscription = payment.getSubscription();
       subscription.setStartDate(LocalDate.now());
       subscription.setEndDate(LocalDate.now().plusMonths(1));
-
+      subscription.setStatus(PackageStatus.ACTIVE);
       subscriptionRepository.save(subscription);
     }
 
@@ -96,7 +109,8 @@ public class PaymentService {
   }
 
   private Subscription findSubscription(Long subscriptionId) {
-    return subscriptionRepository.findSubscriptionById(subscriptionId)
+    return subscriptionRepository.findSubscriptionBySubscriptionId(
+        subscriptionId)
         .orElseThrow(() -> new RuntimeException("Subscription not found with id: " + subscriptionId));
   }
 

@@ -22,7 +22,7 @@ public interface UserMapper {
    UserDTO toUserDTO(User user);
 
    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-   @Mapping(target = "id", ignore = true)
+   @Mapping(target = "userId", ignore = true)
    User updateUser(UserUpdateRequest request, @MappingTarget User target);
 
    List<UserDTO> toListUserDTO(List<User> users);

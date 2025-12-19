@@ -58,4 +58,15 @@ public class PaymentController {
         .build();
   }
 
+  @PostMapping("/{provider}/ipn")
+  public ApiResponse<String> callBackIpn(@PathVariable String provider,
+      @RequestParam Map<String, String> params) {
+
+    paymentService.handleIpn(provider, params);
+    return ApiResponse.<String>builder()
+        .code(200)
+        .message("Succes to call IPN")
+        .data("Payment IPN successful")
+        .build();
+  }
 }

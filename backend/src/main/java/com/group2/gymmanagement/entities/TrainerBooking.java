@@ -15,10 +15,11 @@ import lombok.NoArgsConstructor;
 public class TrainerBooking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "trainer_booking_id")
+    private Long trainerBookingId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "user_id")
     private User member;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -6,6 +6,10 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +19,8 @@ public class UserSpecification {
 
   private final UserRepository userRepository;
 
-  public List<User> getUsersByFilter(Map<String, Object> filters) {
+  public Page<User> getUsersByFilter(Map<String, Object> filters, int page, int size) {
+
     Specification<User> spec = (root, query, cb) -> {
       Predicate predicate = cb.conjunction();
 
@@ -44,6 +49,13 @@ public class UserSpecification {
       return predicate;
     };
 
-    return userRepository.findAll(spec);
+    size = Math.min(size, 20);
+
+    Pageable pageable = PageRequest.of(
+        page,
+        size,
+        Sort.by("fullName").ascending());
+
+    return userRepository.findAll(spec, pageable);
   }
 }

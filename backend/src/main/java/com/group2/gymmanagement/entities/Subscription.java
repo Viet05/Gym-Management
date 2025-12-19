@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "subscription_id")
+    private Long subscriptionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
