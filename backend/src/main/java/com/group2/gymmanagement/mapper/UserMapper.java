@@ -23,6 +23,7 @@ public interface UserMapper {
 
    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
    @Mapping(target = "id", ignore = true)
+   @Mapping(source = "userName", target = "username")
    User updateUser(UserUpdateRequest request, @MappingTarget User target);
 
    List<UserDTO> toListUserDTO(List<User> users);

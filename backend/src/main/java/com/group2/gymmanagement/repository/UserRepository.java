@@ -4,8 +4,9 @@ import com.group2.gymmanagement.entities.User;
 import com.group2.gymmanagement.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
@@ -25,4 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
   long countByRole(UserRole role);
 
   long countByStatus(String status);
+
+  /** BUG-6 FIX: Count active users regardless of whether status is "1" or "ACTIVE". */
+  long countByStatusIn(Collection<String> statuses);
 }

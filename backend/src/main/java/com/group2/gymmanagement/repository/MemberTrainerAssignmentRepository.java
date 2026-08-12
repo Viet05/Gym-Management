@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberTrainerAssignmentRepository extends
-    JpaRepository<MemberTrainerAssignment, Integer> {
+    JpaRepository<MemberTrainerAssignment, Long> {
 
   List<MemberTrainerAssignment> findByMember(User member);
 

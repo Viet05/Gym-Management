@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class PackageController {
   PackageService packageService;
 
   @PostMapping("/pakages")
-  public ApiResponse<PackageDTO> createPackage(@RequestBody PackageCreateRequest request) {
+  public ApiResponse<PackageDTO> createPackage(@RequestBody @Valid PackageCreateRequest request) {
     return ApiResponse.<PackageDTO>builder()
         .code(200)
         .message("Create success")
@@ -38,7 +39,7 @@ public class PackageController {
   }
 
   @PutMapping("/pakages/{id}")
-  public ApiResponse<PackageDTO> updatePackage(@PathVariable Long id, @RequestBody PackageUpdateRequest request) {
+  public ApiResponse<PackageDTO> updatePackage(@PathVariable Long id, @RequestBody @Valid PackageUpdateRequest request) {
     return ApiResponse.<PackageDTO>builder()
         .code(200)
         .message("Update success")

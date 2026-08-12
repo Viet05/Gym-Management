@@ -1,6 +1,9 @@
 package com.group2.gymmanagement.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,8 +19,13 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PackageCreateRequest {
 
+  @NotBlank
   String name;
-  String durationMonth;
+  @NotNull
+  @Positive
+  Long durationMonth;
+  @NotNull
+  @Positive
   Double price;
   String description;
 }

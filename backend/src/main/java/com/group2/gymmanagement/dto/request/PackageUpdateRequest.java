@@ -1,6 +1,7 @@
 package com.group2.gymmanagement.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +18,9 @@ import lombok.experimental.FieldDefaults;
 public class PackageUpdateRequest {
 
   String name;
-  String durationMonth;
+  @Positive
+  Long durationMonth;
+  @Positive
   Double price;
   String description;
 }

@@ -18,6 +18,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +35,10 @@ public class UserService {
   public UserDTO createUser(UserCreateRequest request) {
 
     if (userRepository.existsByEmail(request.getEmail()))
-      throw new RuntimeException("Email already exists");
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
 
     if (userRepository.existsByUsername(request.getUserName()))
-      throw new RuntimeException("Username already exists");
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 
     User user = userMapper.toUser(request);
     user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -63,11 +65,16 @@ public class UserService {
   public UserDTO updateUser(Long id, UserUpdateRequest request) {
 
     User user = userRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("User not found"));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-    if (!user.getEmail().equals(request.getEmail()) &&
+    if (request.getEmail() != null && !user.getEmail().equals(request.getEmail()) &&
         userRepository.existsByEmail(request.getEmail())) {
-      throw new RuntimeException("Email already exists");
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+    }
+
+    if (request.getUserName() != null && !user.getUsername().equals(request.getUserName())
+        && userRepository.existsByUsername(request.getUserName())) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
     }
 
     userMapper.updateUser(request, user);
@@ -85,6 +92,9 @@ public class UserService {
   }
 
   public void deleteUser(Long id) {
+    if (!userRepository.existsById(id)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+    }
     if (trainerProfileRepository.existsById(id)) {
       trainerProfileRepository.deleteById(id);
     }

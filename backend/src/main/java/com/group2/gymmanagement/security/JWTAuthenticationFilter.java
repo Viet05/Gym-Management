@@ -4,9 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,11 +19,16 @@ import java.io.IOException;
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-  @Autowired
-  private JwtUtils jwtUtils;
+  private final JwtUtils jwtUtils;
+  private final CustomUserDetailsService customUserDetailsService;
 
-  @Autowired
-  private CustomUserDetailsService customUserDetailsService;
+  public JWTAuthenticationFilter(
+      JwtUtils jwtUtils,
+      CustomUserDetailsService customUserDetailsService
+  ) {
+    this.jwtUtils = jwtUtils;
+    this.customUserDetailsService = customUserDetailsService;
+  }
 
   @Override
   protected void doFilterInternal(
@@ -67,7 +70,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
+      // Do not expose token parsing details to clients or stdout. The request will proceed
+      // unauthenticated and Spring Security will return the appropriate 401/403 response.
+      log.warn("Unable to authenticate request using the supplied JWT: {}", e.getMessage());
     }
 
     //Cho request đi tiếp

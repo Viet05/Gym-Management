@@ -3,8 +3,15 @@ package com.group2.gymmanagement.controller;
 import com.group2.gymmanagement.dto.request.UserCreateRequest;
 import com.group2.gymmanagement.dto.request.UserUpdateRequest;
 import com.group2.gymmanagement.dto.response.ApiResponse;
+import com.group2.gymmanagement.dto.response.DashboardStatsDTO;
 import com.group2.gymmanagement.dto.response.UserDTO;
+import com.group2.gymmanagement.enums.UserRole;
+import com.group2.gymmanagement.repository.AttendanceRepository;
+import com.group2.gymmanagement.repository.PaymentRepository;
+import com.group2.gymmanagement.repository.UserRepository;
 import com.group2.gymmanagement.service.UserService;
+import jakarta.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
@@ -21,12 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.group2.gymmanagement.dto.response.DashboardStatsDTO;
-import com.group2.gymmanagement.enums.UserRole;
-import com.group2.gymmanagement.repository.AttendanceRepository;
-import com.group2.gymmanagement.repository.PaymentRepository;
-import com.group2.gymmanagement.repository.UserRepository;
-
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -40,7 +41,7 @@ public class AdminController {
   AttendanceRepository attendanceRepository;
 
   @PostMapping(value = "/users")
-  public ApiResponse<UserDTO> createUser(@RequestBody UserCreateRequest request) {
+  public ApiResponse<UserDTO> createUser(@RequestBody @Valid UserCreateRequest request) {
     return ApiResponse.<UserDTO>builder()
         .code(200)
         .message("Success")
@@ -49,7 +50,7 @@ public class AdminController {
   }
 
   @PutMapping(value = "/users/{id}")
-  public ApiResponse<UserDTO> updateUser(@PathVariable("id") Long id, @RequestBody UserUpdateRequest request) {
+  public ApiResponse<UserDTO> updateUser(@PathVariable("id") Long id, @RequestBody @Valid UserUpdateRequest request) {
     return ApiResponse.<UserDTO>builder()
         .code(200)
         .message("Success")
@@ -70,7 +71,9 @@ public class AdminController {
   public ApiResponse<DashboardStatsDTO> getDashboardStats() {
     Double totalRevenue = paymentRepository.sumTotalRevenue();
     long totalMembers = userRepository.countByRole(UserRole.MEMBER);
-    long activeMembers = userRepository.countByStatus("1");
+
+    // BUG-6 FIX: count both "1" (legacy numeric) and "ACTIVE" (string) as active statuses
+    long activeMembers = userRepository.countByStatusIn(Arrays.asList("1", "ACTIVE"));
     long visitsToday = attendanceRepository.countByDate(java.time.LocalDate.now().toString());
 
     DashboardStatsDTO stats = DashboardStatsDTO.builder()
@@ -78,8 +81,8 @@ public class AdminController {
         .totalMembers(totalMembers)
         .activeMembers(activeMembers)
         .visitsToday(visitsToday)
-        .revenueTrend(12.5) // Mock trend
-        .memberTrend(8.2) // Mock trend
+        .revenueTrend(12.5) // Mock trend — can be computed from payment history
+        .memberTrend(8.2)   // Mock trend — can be computed from user join dates
         .build();
 
     return ApiResponse.<DashboardStatsDTO>builder()
@@ -89,9 +92,13 @@ public class AdminController {
         .build();
   }
 
+  /** BUG-4 FIX: Return ApiResponse<Void> instead of raw String for API contract consistency. */
   @DeleteMapping(value = "/users/{id}")
-  public String deleteUser(@PathVariable("id") Long id) {
+  public ApiResponse<Void> deleteUser(@PathVariable("id") Long id) {
     userService.deleteUser(id);
-    return "Success";
+    return ApiResponse.<Void>builder()
+        .code(200)
+        .message("Deleted successfully")
+        .build();
   }
 }

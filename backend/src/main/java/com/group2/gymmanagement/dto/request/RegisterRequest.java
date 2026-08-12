@@ -1,5 +1,6 @@
 package com.group2.gymmanagement.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Email;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class RegisterRequest {
 
   @NotBlank(message = "Username is required")
-  @Size(min = 8, max = 20)
+  @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
   private String username;
 
   @Email(message = "Invalid email format")
@@ -29,10 +30,11 @@ public class RegisterRequest {
   @NotBlank
   private String fullName;
 
-  @Size(min = 8, max = 20, message = "Password must be least 8 characters")
+  @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters")
   @NotBlank
   private String password;
 
   @NotBlank(message = "Phone is required")
+  @JsonAlias("phone")
   private String phoneNumber;
 }

@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,9 +30,11 @@ public class AuthenService {
 
   public AuthResponse registerUser(RegisterRequest request) {
 
-    if (userRepository.existsByEmail(request.getEmail()) && userRepository.existsByUsername(
-        request.getUsername())) {
-      throw new RuntimeException("Email already in use");
+    if (userRepository.existsByEmail(request.getEmail())) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+    }
+    if (userRepository.existsByUsername(request.getUsername())) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already in use");
     }
 
     User user = userMapper.registerUser(request);
@@ -52,12 +56,16 @@ public class AuthenService {
   public AuthResponse login(LoginRequest request) {
 
     User user = userRepository.findByUsername(request.getUsername()).orElseThrow(
-        () -> new RuntimeException("Incorrect username or password"));
+        () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect username or password"));
 
     boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
     if (!matches) {
-      throw new RuntimeException("Incorrect username or password");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect username or password");
+    }
+
+    if (!"1".equals(user.getStatus()) && !"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account is inactive");
     }
 
     String token = jwtUtils.generateToken(user);

@@ -12,6 +12,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class PackageService {
   public PackageDTO createPackage(PackageCreateRequest request) {
 
     if (packageRepo.existsByName(request.getName())) {
-      throw new RuntimeException("Package name already exists");
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Package name already exists");
     }
 
     MembershipPackage pack = packageMapper.toMembershipPackage(request);
@@ -36,8 +38,13 @@ public class PackageService {
   public PackageDTO updatePackage(Long id, PackageUpdateRequest request) {
 
     MembershipPackage packageUpdate = packageRepo.findById(id).orElseThrow(
-        () -> new RuntimeException("Package not found")
+        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Package not found")
     );
+
+    if (request.getName() != null && !packageUpdate.getName().equals(request.getName())
+        && packageRepo.existsByName(request.getName())) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Package name already exists");
+    }
 
     MembershipPackage packages = packageMapper.toMembershipPackageUpdate(request, packageUpdate);
     packageRepo.save(packages);
@@ -51,6 +58,9 @@ public class PackageService {
   }
 
   public void deletePackage(Long id) {
+    if (!packageRepo.existsById(id)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package not found");
+    }
     packageRepo.deleteById(id);
   }
 }
